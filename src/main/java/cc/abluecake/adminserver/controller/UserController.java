@@ -1,19 +1,19 @@
 package cc.abluecake.adminserver.controller;
 
+import cc.abluecake.adminserver.common.Result;
 import cc.abluecake.adminserver.entity.User;
-import cc.abluecake.adminserver.mapper.UserMapper;
+import cc.abluecake.adminserver.service.UserService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RequestMapping("/users")
 @RestController
 public class UserController {
 
     @Autowired
-    private UserMapper userMapper;
+    private UserService userService;
 
     /**
      * 新增用户
@@ -21,16 +21,16 @@ public class UserController {
      * @return
      */
     @PostMapping()
-    public String add(@RequestBody User user){
-        return "用户新增成功";
+    public Result add(@RequestBody User user){
+        return Result.success(userService.save(user));
     }
     /**
      * 查询所有用户
      * @return
      */
     @GetMapping()
-    public List<User> getAll(){
-        return userMapper.selectList(null);
+    public Result getAll(){
+        return Result.success(userService.list());
     }
     /**
      * 查询单个用户
@@ -38,38 +38,41 @@ public class UserController {
      * @return
      */
     @GetMapping("/{id}")
-    public String getOne(@PathVariable Long id){
-        return "查询单个用户成功";
+    public Result getOne(@PathVariable Long id){
+        return Result.success(userService.getById(id));// getOne方法可以自定义条件查询
     }
     /**
      * 修改一个用户
      * @param id
-     * @param user 此user里面建议不含id，避免目标混乱
+     * @param user 使用此user里面的id，直接传入的id作为冗余设计
      * @return
      */
     @PutMapping("/{id}")
-    public String update(@PathVariable Long id, @RequestBody User user){
-        return "修改用户成功";
+    public Result update(@PathVariable Long id, @RequestBody User user){
+        return Result.success(userService.updateById(user));
     }
-
     /**
      * 删除一条用户
      * @param id
      * @return
      */
     @DeleteMapping("/users/{id}")
-    public String delete(@PathVariable Long id){
-        return "删除用户成功";
+    public Result delete(@PathVariable Long id){
+        return Result.success(userService.removeById(id));
     }
     /**
      * 分页查询用户
-     * @param current 当前页码（从1开始）
-     * @param size 每页的行数
+     * @param pageNum 当前页码（从1开始）
+     * @param pageSize 每页的行数
+     * @param name 查询条件
      * @return
      */
-    @GetMapping("/{current}/{size}")
-    public List<User> getPage(@PathVariable Long current, @PathVariable Long size){
-        return userMapper.selectPage(new Page<User>(current, size), null).getRecords();
+    @GetMapping("/page")
+    public Result getPage(@RequestParam(defaultValue = "1" ) Integer pageNum, @RequestParam(defaultValue = "10" ) Integer pageSize, @RequestParam(defaultValue = "" ) String name){
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        if(!"".equals(name) && name!=null){
+            queryWrapper.eq(User::getName,name);
+        }
+        return Result.success(userService.page(new Page<User>(pageNum,pageSize),queryWrapper));
     }
-
 }
