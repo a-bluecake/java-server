@@ -13,7 +13,7 @@ public class Result implements Serializable {
     private static final long serialVersionUID = 1L;
 
     // 响应状态码
-    private int code;
+    private Integer code;
 
     // 响应提示信息
     private String msg;
@@ -45,7 +45,7 @@ public class Result implements Serializable {
      * @param data 返回的属性
      * @return 封装好的统一返回对象Result
      */
-    public static Result success(int code, String msg, Object data) {
+    public static Result success(Integer code, String msg, Object data) {
         Result r = new Result();
         r.setCode(code);
         r.setMsg(msg);
@@ -76,7 +76,7 @@ public class Result implements Serializable {
      * @param data 返回的属性
      * @return 封装好的统一返回对象Result
      */
-    public static Result error(int code, String msg, Object data) {
+    public static Result error(Integer code, String msg, Object data) {
         Result r = new Result();
         r.setCode(code);
         r.setMsg(msg);
