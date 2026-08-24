@@ -3,6 +3,7 @@ package cc.abluecake.adminserver.controller;
 import cc.abluecake.adminserver.common.Result;
 import cc.abluecake.adminserver.entity.User;
 import cc.abluecake.adminserver.service.UserService;
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,4 +76,23 @@ public class UserController {
         }
         return Result.success(userService.page(new Page<User>(pageNum,pageSize),queryWrapper));
     }
+
+    //Sa-Token管理接口
+    // 测试登录
+    @RequestMapping("doLogin")
+    public Result doLogin(String username, String password) {
+        // 此处仅作模拟示例，真实项目需要从数据库中查询数据进行比对
+        if("zhang".equals(username) && "123456".equals(password)) {
+            StpUtil.login(10001);
+            return Result.success();
+
+        }
+        return Result.error("登录失败");
+    }
+    // 查询登录状态
+    @RequestMapping("isLogin")
+    public Result isLogin() {
+        return Result.success("当前会话是否登录：" + StpUtil.isLogin());
+    }
+
 }
