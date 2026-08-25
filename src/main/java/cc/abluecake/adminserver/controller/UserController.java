@@ -3,6 +3,8 @@ package cc.abluecake.adminserver.controller;
 import cc.abluecake.adminserver.common.Result;
 import cc.abluecake.adminserver.entity.User;
 import cc.abluecake.adminserver.service.UserService;
+import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -22,6 +24,7 @@ public class UserController {
      * @return
      */
     @PostMapping()
+    @SaCheckPermission("user.add")
     public Result add(@RequestBody User user){
         return Result.success(userService.save(user));
     }
@@ -30,6 +33,7 @@ public class UserController {
      * @return
      */
     @GetMapping()
+    @SaCheckPermission("user.get")
     public Result getAll(){
         return Result.success(userService.list());
     }
@@ -39,6 +43,7 @@ public class UserController {
      * @return
      */
     @GetMapping("/{id}")
+    @SaCheckPermission("user.get")
     public Result getOne(@PathVariable Long id){
         return Result.success(userService.getById(id));// getOne方法可以自定义条件查询
     }
@@ -49,6 +54,7 @@ public class UserController {
      * @return
      */
     @PutMapping("/{id}")
+    @SaCheckPermission("user.update")
     public Result update(@PathVariable Long id, @RequestBody User user){
         return Result.success(userService.updateById(user));
     }
@@ -58,6 +64,7 @@ public class UserController {
      * @return
      */
     @DeleteMapping("/users/{id}")
+    @SaCheckPermission("user.delete")
     public Result delete(@PathVariable Long id){
         return Result.success(userService.removeById(id));
     }
@@ -69,6 +76,7 @@ public class UserController {
      * @return
      */
     @GetMapping("/page")
+    @SaCheckPermission("user.get")
     public Result getPage(@RequestParam(defaultValue = "1" ) Integer pageNum, @RequestParam(defaultValue = "10" ) Integer pageSize, @RequestParam(defaultValue = "" ) String name){
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
         if(!"".equals(name) && name!=null){
@@ -93,6 +101,19 @@ public class UserController {
     @RequestMapping("isLogin")
     public Result isLogin() {
         return Result.success("当前会话是否登录：" + StpUtil.isLogin());
+    }
+    // 前后端分离登录接口
+    @RequestMapping("getLoginInfo")
+    public Result getLoginInfo(String username, String password) {
+        if("zhang".equals(username) && "123456".equals(password)) {
+            // 第1步，先登录上
+            StpUtil.login(10001);
+            // 第2步，获取 Token  相关参数
+            SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
+            // 第3步，返回给前端
+            return Result.success(tokenInfo);
+        }
+        return Result.error("登录失败");
     }
 
 }
