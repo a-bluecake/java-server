@@ -90,7 +90,7 @@ public class UserController {
     @RequestMapping("doLogin")
     public Result doLogin(String username, String password) {
         // 此处仅作模拟示例，真实项目需要从数据库中查询数据进行比对
-        if("zhang".equals(username) && "123456".equals(password)) {
+        if("a-bluecake".equals(username) && "123456".equals(password)) {
             StpUtil.login(10001);
             return Result.success();
 
@@ -105,7 +105,7 @@ public class UserController {
     // 前后端分离登录接口
     @RequestMapping("getLoginInfo")
     public Result getLoginInfo(String username, String password) {
-        if("zhang".equals(username) && "123456".equals(password)) {
+        if("a-bluecake".equals(username) && "123456".equals(password)) {
             // 第1步，先登录上
             StpUtil.login(10001);
             // 第2步，获取 Token  相关参数
